@@ -14,6 +14,7 @@ void displayMarquee(const std::string& text, int width, int height, int refreshR
     int dx = 1, dy = 1;
     std::size_t textLength = text.length(); // Use std::size_t to avoid conversion warning
     std::string command;
+    std::string lastCommand;
 
     // Seed the random number generator
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
@@ -77,6 +78,12 @@ void displayMarquee(const std::string& text, int width, int height, int refreshR
             std::cout << "\033[" << (height - 1) << ";1H"; // Move cursor to the last line
             std::cout << "Enter a command for MARQUEE_CONSOLE: " << command << std::flush;
 
+            // Print the last processed command if any
+            if (!lastCommand.empty()) {
+                std::cout << "\033[" << height << ";1H"; // Move cursor to the line below the prompt
+                std::cout << "Command processed in MARQUEE_CONSOLE: " << lastCommand << std::flush;
+            }
+
             lastRefreshTime = currentTime;
         }
 
@@ -84,7 +91,7 @@ void displayMarquee(const std::string& text, int width, int height, int refreshR
         if (_kbhit()) {
             char ch = _getch();
             if (ch == '\r') { // Enter key
-                // Process the command here if needed
+                lastCommand = command; // Store the last command
                 command.clear(); // Clear the command after processing
             }
             else if (ch == '\b') { // Backspace key
