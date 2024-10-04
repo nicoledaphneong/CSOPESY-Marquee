@@ -13,6 +13,7 @@ void displayMarquee(const std::string& text, int width, int height, int refreshR
     int x = 0, y = 0;
     int dx = 1, dy = 1;
     std::size_t textLength = text.length(); // Use std::size_t to avoid conversion warning
+    std::string command;
 
     // Seed the random number generator
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
@@ -38,7 +39,7 @@ void displayMarquee(const std::string& text, int width, int height, int refreshR
             if (x <= 0 || x + textLength >= width) {
                 dx = -dx;
             }
-            if (y <= 0 || y >= height - 5) { // Adjust height to account for header
+            if (y <= 0 || y >= height - 6) { // Adjust height to account for header and prompt
                 dy = -dy;
             }
 
@@ -53,7 +54,7 @@ void displayMarquee(const std::string& text, int width, int height, int refreshR
             std::cout << "\033[4;1H"; // Move cursor to line 4, column 1
 
             // Clear the previous text
-            for (int i = 0; i < height - 5; ++i) {
+            for (int i = 0; i < height - 6; ++i) {
                 std::cout << "\033[K\n"; // Clear the line and move to the next line
             }
             std::cout << "\033[K"; // Clear the last line
@@ -72,7 +73,28 @@ void displayMarquee(const std::string& text, int width, int height, int refreshR
             // Print the text
             std::cout << text << std::flush;
 
+            // Move cursor to the line below the marquee and print the prompt
+            std::cout << "\033[" << (height - 1) << ";1H"; // Move cursor to the last line
+            std::cout << "Enter a command for MARQUEE_CONSOLE: " << command << std::flush;
+
             lastRefreshTime = currentTime;
+        }
+
+        // Check for user input
+        if (_kbhit()) {
+            char ch = _getch();
+            if (ch == '\r') { // Enter key
+                // Process the command here if needed
+                command.clear(); // Clear the command after processing
+            }
+            else if (ch == '\b') { // Backspace key
+                if (!command.empty()) {
+                    command.pop_back();
+                }
+            }
+            else {
+                command += ch;
+            }
         }
 
         // Sleep for a short duration to prevent high CPU usage
