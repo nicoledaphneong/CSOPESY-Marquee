@@ -128,12 +128,12 @@ void displayMarqueeAndHandleInput(const std::string& text, int width, int height
 
 // Main function
 int main() {
-    std::string text = "Hello World!";
+    std::string text = "Hello World in Marquee!";
     int width = 80; // Width of the display window
     int height = 24; // Height of the display window
     int refreshRateMs = 17;
     int pollingRateMs = 17;
-    bool useThreading = true;
+    bool useThreading = false;
 
     if (useThreading) {
         // Run the functions using threads
