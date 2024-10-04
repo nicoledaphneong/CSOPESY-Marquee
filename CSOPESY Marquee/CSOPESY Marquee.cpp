@@ -1,3 +1,4 @@
+// Include necessary headers
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -8,14 +9,16 @@
 #include <conio.h> // For _kbhit() and _getch()
 #include <vector>
 
+// Declare global variables and mutex
 std::mutex mtx;
+std::string command;
+std::vector<std::string> processedCommands;
 
-void displayMarquee(const std::string& text, int width, int height, int refreshRateMs, int pollingRateMs) {
+// Function to display the marquee and handle user input
+void displayMarqueeAndHandleInput(const std::string& text, int width, int height, int refreshRateMs, int pollingRateMs) {
     int x = 0, y = 0;
     int dx = 1, dy = 1;
     std::size_t textLength = text.length(); // Use std::size_t to avoid conversion warning
-    std::string command;
-    std::vector<std::string> processedCommands;
 
     // Seed the random number generator
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
@@ -92,9 +95,10 @@ void displayMarquee(const std::string& text, int width, int height, int refreshR
             lastRefreshTime = currentTime;
         }
 
-        // Check for user input
+        // Handle user input
         if (_kbhit()) {
             char ch = _getch();
+            std::lock_guard<std::mutex> lock(mtx);
             if (ch == '\r') { // Enter key
                 processedCommands.push_back(command); // Store the command
                 command.clear(); // Clear the command after processing
@@ -122,14 +126,24 @@ void displayMarquee(const std::string& text, int width, int height, int refreshR
     }
 }
 
+// Main function
 int main() {
     std::string text = "Hello World!";
     int width = 80; // Width of the display window
     int height = 24; // Height of the display window
-    int refreshRateMs = 10; // Refresh rate in milliseconds
-    int pollingRateMs = 20; // Polling rate in milliseconds
+    int refreshRateMs = 17;
+    int pollingRateMs = 17;
+    bool useThreading = true;
 
-    displayMarquee(text, width, height, refreshRateMs, pollingRateMs);
+    if (useThreading) {
+        // Run the functions using threads
+        std::thread marqueeThread(displayMarqueeAndHandleInput, text, width, height, refreshRateMs, pollingRateMs);
+        marqueeThread.join();
+    }
+    else {
+        // Run the combined function without threading
+        displayMarqueeAndHandleInput(text, width, height, refreshRateMs, pollingRateMs);
+    }
 
     return 0;
 }
