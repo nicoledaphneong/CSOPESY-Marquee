@@ -77,12 +77,17 @@ void displayMarquee(const std::string& text, int width, int height, int refreshR
 
             // Move cursor to the line below the marquee and print the prompt
             std::cout << "\033[" << (height - 1) << ";1H"; // Move cursor to the last line
+            std::cout << "\033[K"; // Clear the line
             std::cout << "Enter a command for MARQUEE_CONSOLE: " << command << std::flush;
 
             // Print the processed commands
             for (const auto& cmd : processedCommands) {
                 std::cout << "\nCommand processed in MARQUEE_CONSOLE: " << cmd << std::flush;
             }
+
+            // Move cursor back to the input line
+            std::cout << "\033[" << (height - 1) << ";1H"; // Move cursor to the last line
+            std::cout << "Enter a command for MARQUEE_CONSOLE: " << command << std::flush;
 
             lastRefreshTime = currentTime;
         }
@@ -93,6 +98,10 @@ void displayMarquee(const std::string& text, int width, int height, int refreshR
             if (ch == '\r') { // Enter key
                 processedCommands.push_back(command); // Store the command
                 command.clear(); // Clear the command after processing
+                // Clear the input line and move the cursor back to the input line
+                std::cout << "\033[" << (height - 1) << ";1H"; // Move cursor to the last line
+                std::cout << "\033[K"; // Clear the line
+                std::cout << "Enter a command for MARQUEE_CONSOLE: " << std::flush;
             }
             else if (ch == '\b') { // Backspace key
                 if (!command.empty()) {
@@ -102,6 +111,10 @@ void displayMarquee(const std::string& text, int width, int height, int refreshR
             else {
                 command += ch;
             }
+
+            // Move cursor back to the input line
+            std::cout << "\033[" << (height - 1) << ";1H"; // Move cursor to the last line
+            std::cout << "Enter a command for MARQUEE_CONSOLE: " << command << std::flush;
         }
 
         // Sleep for a short duration to prevent high CPU usage
